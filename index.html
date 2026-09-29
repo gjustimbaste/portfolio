@@ -911,7 +911,7 @@ button.file-link { background: none; cursor: pointer; font-family: inherit; }
 
   <footer>
     <div class="social-links">
-      <a href="https://github.com/gjustimbaste" target="_blank" rel="noopener noreferrer" title="GitHub">
+     <a href="https://github.com/gjustimbaste" target="_blank" rel="noopener noreferrer" title="GitHub">
         <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
           0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
@@ -1039,10 +1039,17 @@ button.file-link { background: none; cursor: pointer; font-family: inherit; }
     const fd = new FormData();
     fd.append('file', file);
     fd.append('upload_preset', UPLOAD_PRESET);
+    fd.append('use_filename', 'true');
+    fd.append('unique_filename', 'true');
     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, { method: 'POST', body: fd });
     const data = await res.json();
     if (!res.ok) throw new Error((data.error && data.error.message) || 'Upload failed');
-    return data.secure_url;
+    let url = data.secure_url;
+    const ext = (data.format || '').toLowerCase();
+    if (ext && !url.toLowerCase().endsWith('.' + ext)) {
+      url += '.' + ext;
+    }
+    return url;
   }
 
   // ---- Records data (synced live with Firestore) ----
