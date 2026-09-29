@@ -1036,11 +1036,13 @@ button.file-link { background: none; cursor: pointer; font-family: inherit; }
   }
 
   async function uploadToCloudinary(file) {
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const publicId = `portfolio_${Date.now()}_${safeName}`;
+
     const fd = new FormData();
     fd.append('file', file);
     fd.append('upload_preset', UPLOAD_PRESET);
-    fd.append('use_filename', 'true');
-    fd.append('unique_filename', 'true');
+    fd.append('public_id', publicId);
     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, { method: 'POST', body: fd });
     const data = await res.json();
     if (!res.ok) throw new Error((data.error && data.error.message) || 'Upload failed');
